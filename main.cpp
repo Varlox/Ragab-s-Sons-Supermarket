@@ -2,6 +2,6 @@
 using namespace std;
 int main()
 {
-  cout << "this is اولاد رجب";
+  cout << "this is awlad ragab";
   system("pause");
 }
