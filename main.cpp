@@ -34,3 +34,25 @@ struct order
   double totalPrice;
   int numProducts;
 };
+
+void login(customer &c)
+{
+
+  do
+  {
+    cout << "Enter your ID: ";
+    cin >> c.Id;
+    cout << "Enter your password: ";
+    cin >> c.password;
+    if (c == customers[0].Id && c.password == customers[0].password)
+    {
+      cout << "Login successful!" << endl;
+      cout << "Welcome, " << customers[0].name << "!" << endl;
+      continue;
+    }
+    else
+    {
+      cout << "Invalid ID or password." << endl;
+    }
+  } while (c != customers[0].Id && c.password != customers[0].password);
+}
