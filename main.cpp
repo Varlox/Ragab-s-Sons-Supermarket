@@ -2,21 +2,26 @@
 #include <string>
 #include <fstream>
 using namespace std;
+
 const int Max = 100;
+
 struct customer
 {
-  int Id;
+  string Id; // Change from int to string
   string password;
   string name;
   string phone;
   string location;
 };
+
 customer customers[Max];
 int customer_count = 0;
+
 struct date
 {
   int day, month, year;
 };
+
 struct product
 {
   int code, quantity;
@@ -26,8 +31,10 @@ struct product
   date expirationDate;
   double price;
 };
+
 product products[Max];
 int product_count = 0;
+
 struct order
 {
   int customerId;
@@ -36,10 +43,12 @@ struct order
   int numProducts;
 };
 
-void signup(customer &c)
+void signup()
 {
+  customer c;
   cout << "Enter your ID: ";
   cin >> c.Id;
+
   cout << "Enter your password: ";
   cin >> c.password;
   cout << "Enter your name: ";
@@ -48,11 +57,23 @@ void signup(customer &c)
   cin >> c.phone;
   cout << "Enter your location: ";
   cin >> c.location;
-  customers[customer_count] = c;
-  customer_count++;
-  cout << "Signup successful!" << endl;
 
-  ofstream file("customers.txt", ios::app); // Open file in append mode
+  // Check for duplicate ID
+  ifstream infile("customers.txt");
+  string existingId;
+  string password, name, phone, location;
+  while (infile >> existingId >> password >> name >> phone >> location)
+  {
+    if (existingId == c.Id)
+    {
+      cout << "Error: ID already exists. Please use a different ID." << endl;
+      return;
+    }
+  }
+  infile.close();
+
+  // Save the customer data to a file
+  ofstream file("customers.txt", ios::app);
   if (file.is_open())
   {
     file << c.Id << " " << c.password << " " << c.name << " " << c.phone << " " << c.location << endl;
@@ -61,28 +82,28 @@ void signup(customer &c)
   }
   else
   {
-    cout << "Error: Unable to open file to save data." << endl;
+    cerr << "Error: Unable to open file to save data." << endl;
   }
 }
 
 void login()
 {
-  int inputId;
+  string inputId;
   string inputPassword;
   bool loginSuccessful = false;
 
   cout << "Enter your ID: ";
   cin >> inputId;
+
   cout << "Enter your password: ";
   cin >> inputPassword;
 
-  ifstream file("customers.txt"); // Open the file for reading
+  ifstream file("customers.txt");
   if (file.is_open())
   {
-    int id;
+    string id;
     string password, name, phone, location;
 
-    // Read each line from the file and check credentials
     while (file >> id >> password >> name >> phone >> location)
     {
       if (id == inputId && password == inputPassword)
@@ -102,14 +123,13 @@ void login()
   }
   else
   {
-    cout << "Error: Unable to open file to verify login." << endl;
+    cerr << "Error: Unable to open file to verify login." << endl;
   }
 }
 
 int main()
 {
   int choice;
-  customer c;
   do
   {
     cout << "1. Signup" << endl;
@@ -121,7 +141,7 @@ int main()
     switch (choice)
     {
     case 1:
-      signup(c);
+      signup();
       break;
     case 2:
       login();
