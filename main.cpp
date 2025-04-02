@@ -42,133 +42,6 @@ struct order
   double totalPrice;
   int numProducts;
 };
-struct Product
-{
-  int id;
-  string name;
-  float price;
-  int quantity;
-};
-void View_product_details(Product products[])
-{
-  const int size = 30;
-  int productId;
-  cout << "Enter Product ID to view details: ";
-  cin >> productId;
-  bool found = true;
-  for (int i = 0; i < size; i++)
-  {
-    if (products[i].id == productId)
-    {
-      cout << "Product ID: " << products[i].id << endl;
-      cout << "Name: " << products[i].name << endl;
-      cout << "Price= " << products[i].price << " $" << endl;
-      cout << "Quantity= " << products[i].quantity << endl;
-      found = true;
-      break;
-    }
-    if (!found)
-    {
-      cout << "Product not found!" << endl;
-    }
-  }
-}
-void Display_Products_Menu()
-{
-  int number_of_Category;
-  cout << "choose which category what you want:" << endl;
-  cout << "1-bakery\n2-diary\n3-snacks\n4-sweets\n5-beverages\n6-dry food" << endl;
-
-  while (true)
-  {
-    cin >> number_of_Category;
-    switch (number_of_Category)
-    {
-    case 1:
-      int number_of_products_in_bakery;
-      cout << "select what you want:" << endl;
-      cout << "1-phino bread\n2-balady bread\n3-lebanese bread\n4-french bread \n5-corroisant" << endl;
-      while (true)
-      {
-        cin >> number_of_products_in_bakery;
-        if (number_of_products_in_bakery < 1 || number_of_products_in_bakery > 5)
-          cout << "invalid choise! try again" << endl;
-        else
-          break;
-      }
-      break;
-    case 2:
-      cout << "select what you want:" << endl;
-      int number_of_products_in_diary;
-      cout << "1-milk\n2-yogurt\n3-cheese\n4-butter" << endl;
-      while (true)
-      {
-        cin >> number_of_products_in_diary;
-        if (number_of_products_in_diary < 1 || number_of_products_in_diary > 4)
-          cout << "invalid choise! try again" << endl;
-        else
-          break;
-      }
-      break;
-    case 3:
-      cout << "select what you want:" << endl;
-      int number_of_products_in_snacks;
-      cout << "1-chips\n2-pop corn\n3-nuts" << endl;
-      while (true)
-      {
-        cin >> number_of_products_in_snacks;
-        if (number_of_products_in_snacks < 1 || number_of_products_in_snacks > 3)
-          cout << "invalid choise! try again" << endl;
-        else
-          break;
-      }
-      break;
-    case 4:
-      cout << "select what you want:" << endl;
-      int number_of_products_in_sweets;
-      cout << "1-candy\n2-choclates\n3-ice cream\n4-cookies\n5-biscuits" << endl;
-      while (true)
-      {
-        cin >> number_of_products_in_sweets;
-        if (number_of_products_in_sweets < 1 || number_of_products_in_sweets > 5)
-          cout << "invalid choise! try again" << endl;
-        else
-          break;
-      }
-      break;
-    case 5:
-      cout << "select what you want:" << endl;
-      int number_of_products_in_beverages;
-      cout << "1-water\n2-juice\n3-cola\n4-tea\n5-coffee" << endl;
-      while (true)
-      {
-        cin >> number_of_products_in_beverages;
-        if (number_of_products_in_beverages < 1 || number_of_products_in_beverages > 5)
-          cout << "invalid choise! try again" << endl;
-        else
-          break;
-      }
-      break;
-    case 6:
-      cout << "select what you want:" << endl;
-      int number_of_Products_in_Dry_food;
-      cout << "1-rice\n2-pasta\n3-flour\n4-sugar\n5-yeast" << endl;
-      while (true)
-      {
-        cin >> number_of_Products_in_Dry_food;
-        if (number_of_Products_in_Dry_food < 1 || number_of_Products_in_Dry_food > 5)
-          cout << "invalid choise! try again" << endl;
-        else
-          break;
-      }
-      break;
-    default:
-      cout << "invalid choice!try again" << endl;
-      break;
-    }
-    break;
-  }
-}
 
 void signup()
 {
@@ -304,6 +177,94 @@ void editCustomerData()
     cerr << "Error: Unable to open file." << endl;
   }
 }
+
+void displayProductMenu()
+{
+  if (product_count == 0)
+  {
+    cout << "No products available in the supermarket." << endl;
+    return;
+  }
+
+  // Step 1: Display categories
+  cout << "Available Categories:" << endl;
+  cout << "1. Bakery" << endl;
+  cout << "2. Dairy" << endl;
+  cout << "3. Snacks" << endl;
+  cout << "4. Sweets" << endl;
+  cout << "5. Beverages" << endl;
+  cout << "6. Dry Food" << endl;
+  cout << "Enter the number of the category you want to view: ";
+  int categoryChoice;
+  cin >> categoryChoice;
+
+  // Step 2: Determine the selected category
+  string selectedCategory;
+  switch (categoryChoice)
+  {
+  case 1:
+    selectedCategory = "Bakery";
+    break;
+  case 2:
+    selectedCategory = "Dairy";
+    break;
+  case 3:
+    selectedCategory = "Snacks";
+    break;
+  case 4:
+    selectedCategory = "Sweets";
+    break;
+  case 5:
+    selectedCategory = "Beverages";
+    break;
+  case 6:
+    selectedCategory = "Dry Food";
+    break;
+  default:
+    cout << "Invalid category choice!" << endl;
+    return;
+  }
+
+  // Step 3: Display products in the selected category
+  cout << "Products in " << selectedCategory << " category:" << endl;
+  cout << "--------------------------------------" << endl;
+  bool found = false;
+  for (int i = 0; i < product_count; i++)
+  {
+    if (products[i].Category == selectedCategory)
+    {
+      found = true;
+      cout << i + 1 << ". " << products[i].name << endl;
+      cout << "   Code: " << products[i].code << endl;
+      cout << "   Price: $" << products[i].price << endl;
+      cout << "   Quantity: " << products[i].quantity << endl;
+      cout << "   Production Date: " << products[i].productionDate.day << "/"
+           << products[i].productionDate.month << "/" << products[i].productionDate.year << endl;
+      cout << "   Expiration Date: " << products[i].expirationDate.day << "/"
+           << products[i].expirationDate.month << "/" << products[i].expirationDate.year << endl;
+      cout << "--------------------------------------" << endl;
+    }
+  }
+
+  if (!found)
+  {
+    cout << "No products available in the selected category." << endl;
+  }
+}
+
+void viewProductDetails() {}
+
+void createOrder() {}
+
+void viewOrder() {}
+
+void processOrder() {}
+
+void addProduct() {}
+
+void editProduct() {}
+
+void deleteProduct() {}
 
 int main()
 {
