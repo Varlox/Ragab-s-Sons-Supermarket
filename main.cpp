@@ -43,6 +43,40 @@ struct order
   double totalPrice;
   int numProducts;
 };
+struct Date {
+    int day;
+    int month;
+    int year;
+};
+// Function to view product details
+void View_product_details(Product products[]) {
+    const int size = 30;
+    int productId;
+    cout << "Enter Product ID to view details: ";
+    cin >> productId;
+
+    bool found = false;
+    for (int i = 0; i < size; i++) {
+        if (products[i].id == productId) {
+            cout << "Product ID: " << products[i].id << endl;
+            cout << "Name: " << products[i].name << endl;
+            cout << "Price: " << products[i].price << " $" << endl;
+            cout << "Quantity: " << products[i].quantity << endl;
+            cout << "Production Date: " << products[i].productiondate.day << "/"
+                << products[i].productiondate.month << "/"
+                << products[i].productiondate.year << endl;
+            cout << "Expiry Date: " << products[i].expirydate.day << "/"
+                << products[i].expirydate.month << "/"
+                << products[i].expirydate.year << endl;
+            found = true;
+            break;
+        }
+    }
+
+    if (!found) {
+        cout << "Product not found!" << endl;
+    }
+}
 
 void signup()
 {
@@ -519,6 +553,7 @@ int main()
       }
       else
         login();
+      break;
     case 3:
       MenuAdmin();
       break;
