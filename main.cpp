@@ -90,11 +90,13 @@ void signup()
     }
 }
 
-bool login() {
+bool login()
+{
+    const string adminId = "admin";       // Predefined admin ID
+    const string adminPassword = "1234"; // Predefined admin password
 
     string inputId;
     string inputPassword;
-    bool loginSuccessful = false;
 
     cout << "Enter your ID: ";
     cin >> inputId;
@@ -102,11 +104,19 @@ bool login() {
     cout << "Enter your password: ";
     cin >> inputPassword;
 
+    // Check if the credentials match the admin's
+    if (inputId == adminId && inputPassword == adminPassword)
+    {
+        cout << "Admin login successful!" << endl;
+        MenuAdmin(); // Call the admin menu
+        return true;
+    }
+
+    // Check customer credentials
     ifstream file("customers.txt");
     if (file.is_open())
     {
-        string id;
-        string password, name, phone, location;
+        string id, password, name, phone, location;
 
         while (file >> id >> password >> name >> phone >> location)
         {
@@ -114,25 +124,23 @@ bool login() {
             {
                 cout << "Login successful!" << endl;
                 cout << "Welcome, " << name << "!" << endl;
-                loginSuccessful = true;
-                return loginSuccessful;
-                // break;
+                user_menu(); // Call the user menu
+                return true;
             }
         }
         file.close();
 
-        if (!loginSuccessful)
-        {
-            cout << "Invalid ID or password." << endl;
-            cout << "Please try again." << endl;
-            return loginSuccessful;
-        }
+        cout << "Invalid ID or password." << endl;
+        cout << "Please try again." << endl;
+        return false;
     }
     else
     {
         cerr << "Error: Unable to open file to verify login." << endl;
+        return false;
     }
 }
+
 void editCustomerData()
 {
     string idToEdit;
@@ -590,24 +598,6 @@ void user_menu()
     } while (choice != "7");
 }
 
-int login_menu() {
-    int choice;
-    cout << "1. Admin" << endl;
-    cout << "2. User" << endl;
-    cin >> choice;
-    if (choice == 1) {
-        //        Admin_login();
-        MenuAdmin();
-        return choice;
-    }
-    if (choice == 2) {
-        login();
-        user_menu();
-        return choice;
-    }
-
-}
-
 
 
 int main()
@@ -627,7 +617,7 @@ int main()
         }
         else if (choice == "2")
         {
-            login_menu();
+            login();
         }
         else if (choice == "3")
         {
