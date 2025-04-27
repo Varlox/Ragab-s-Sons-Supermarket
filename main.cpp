@@ -43,167 +43,176 @@ struct order
   double totalPrice;
   int numProducts;
 };
-struct Date {
-    int day;
-    int month;
-    int year;
+struct Date
+{
+  int day;
+  int month;
+  int year;
 };
 void MenuLogin()
 {
-    int choice;
+  int choice;
 
-    do
+  do
+  {
+    cout << endl;
+    cout << "******Welcome to Ragab`s sons Supermarket******" << endl;
+    cout << endl;
+    cout << "1. Edit Customer Data" << endl;
+    cout << "2. display Menu" << endl;
+    cout << "3. Create Order" << endl;
+    cout << "4. View Order" << endl;
+    cout << "5. Calculate Total Price" << endl;
+    cout << "6. Exit" << endl;
+    cin >> choice;
+    switch (choice)
     {
-        cout << endl;
-        cout << "******Welcome to Ragab`s sons Supermarket******" << endl;
-        cout << endl;
-        cout << "1. Edit Customer Data" << endl;
-        cout << "2. display Menu" << endl;
-        cout << "3. Create Order" << endl;
-        cout << "4. View Order" << endl;
-        cout << "5. Calculate Total Price" << endl;
-        cout << "6. Exit" << endl;
-        cin >> choice;
-        switch (choice)
-        {
-        case 1:
-            editCustomerData();
-            break;
-        case 2:
-            displayProductMenu();
-            break;
-        case 3:
-            createOrder();
-            break;
-        case 4:
-            int IDindex;
-            cout << "Please enter ypur ID : ";
-            cin >> IDindex;
-            viewOrder_user(IDindex);
-            break;
-        case 5:
-            cout << "Please enter ypur ID : ";
-            cin >> IDindex;
-            processOrder(IDindex);
-            break;
-        case 6:
-            cout << "Logging out..." << endl;
-            return;
-        default:
-            cout << "Invalid choice. Please try again." << endl;
-            break;
-        }
-    } while (choice != 6);
-}int order_count = 0;
+    case 1:
+      editCustomerData();
+      break;
+    case 2:
+      displayProductMenu();
+      break;
+    case 3:
+      createOrder();
+      break;
+    case 4:
+      int IDindex;
+      cout << "Please enter ypur ID : ";
+      cin >> IDindex;
+      viewOrder_user(IDindex);
+      break;
+    case 5:
+      cout << "Please enter ypur ID : ";
+      cin >> IDindex;
+      processOrder(IDindex);
+      break;
+    case 6:
+      cout << "Logging out..." << endl;
+      return;
+    default:
+      cout << "Invalid choice. Please try again." << endl;
+      break;
+    }
+  } while (choice != 6);
+}
+int order_count = 0;
 order currentOrder[Max];
 
-void viewOrders_admin() {
+void viewOrders_admin()
+{
 
-    if (order_count == 0)
+  if (order_count == 0)
+  {
+    cout << "No orders to display." << endl;
+    return;
+  }
+
+  for (int i = 0; i < order_count; i++)
+  {
+    cout << "\nOrder #" << i + 1 << " for Customer ID: " << currentOrder[i].customerId << endl;
+    cout << "Products: ";
+    for (int j = 0; j < currentOrder[i].numProducts; j++)
     {
-        cout << "No orders to display." << endl;
-        return;
+      cout << currentOrder[i].productName[j];
+      if (j < currentOrder[i].numProducts - 1)
+        cout << ", ";
     }
-
-    for (int i = 0;i < order_count;i++) {
-        cout << "\nOrder #" << i + 1 << " for Customer ID: " << currentOrder[i].customerId << endl;
-        cout << "Products: ";
-        for (int j = 0; j < currentOrder[i].numProducts; j++)
-        {
-            cout << currentOrder[i].productName[j];
-            if (j < currentOrder[i].numProducts - 1)
-                cout << ", ";
-        }
-        cout << "\nTotal Price: $" << currentOrder[i].totalPrice << endl;
-    }
+    cout << "\nTotal Price: $" << currentOrder[i].totalPrice << endl;
+  }
 }
 
-void viewOrder_user(int IDindex) {
+void viewOrder_user(int IDindex)
+{
 
-    bool found = false;
+  bool found = false;
 
-    for (int i = 0; i < order_count; i++)
+  for (int i = 0; i < order_count; i++)
+  {
+    if (currentOrder[i].customerId == IDindex)
     {
-        if (currentOrder[i].customerId == IDindex)
-        {
-            found = true;
-            cout << "\nrder #" << i + 1 << " Customer ID: " << currentOrder[i].customerId << endl;
-            cout << "Products: ";
-            for (int j = 0; j < currentOrder[i].numProducts; j++)
-            {
-                cout << currentOrder[i].productName[j];
-                if (j < currentOrder[i].numProducts - 1)
-                    cout << ", ";
-            }
-            cout << "\nTotal price: $" << currentOrder[i].totalPrice << endl;
-        }
+      found = true;
+      cout << "\nrder #" << i + 1 << " Customer ID: " << currentOrder[i].customerId << endl;
+      cout << "Products: ";
+      for (int j = 0; j < currentOrder[i].numProducts; j++)
+      {
+        cout << currentOrder[i].productName[j];
+        if (j < currentOrder[i].numProducts - 1)
+          cout << ", ";
+      }
+      cout << "\nTotal price: $" << currentOrder[i].totalPrice << endl;
     }
-    if (!found) {
-        cout << "This user has no order yet . " << endl;
-        return;
-    }
+  }
+  if (!found)
+  {
+    cout << "This user has no order yet . " << endl;
+    return;
+  }
 }
 
 void processOrder(int customerId)
 {
-    bool found = false;
+  bool found = false;
 
-    for (int i = 0; i < order_count; i++)
+  for (int i = 0; i < order_count; i++)
+  {
+    if (currentOrder[i].customerId == customerId)
     {
-        if (currentOrder[i].customerId == customerId)
+      found = true;
+      double total = 0;
+      for (int j = 0; j < currentOrder[i].numProducts;)
+      {
+        string p_name = currentOrder[i].productName[j];
+        for (int k = 0; k < product_count; k++)
         {
-            found = true;
-            double total = 0;
-            for (int j = 0; j < currentOrder[i].numProducts;)
-            {
-                string p_name = currentOrder[i].productName[j];
-                for (int k = 0; k < product_count; k++)
-                {
-                    if (products[k].name == p_name)
-                    {
-                        total += products[k].price;
-                        break;
-                    }
-                }
-            }
-            cout << "Total price : " << total << endl;
+          if (products[k].name == p_name)
+          {
+            total += products[k].price;
             break;
+          }
         }
-
+      }
+      cout << "Total price : " << total << endl;
+      break;
     }
-    if (!found)
-    {
-        cout << "This user has no order yet . " << endl;
-    }
+  }
+  if (!found)
+  {
+    cout << "This user has no order yet . " << endl;
+  }
 }
 // Function to view product details
-void View_product_details(Product products[]) {
-    const int size = 30;
-    int productId;
-    cout << "Enter Product ID to view details: ";
-    cin >> productId;
+void View_product_details(product products[])
+{
+  const int size = 30;
+  int productId;
+  cout << "Enter Product ID to view details: ";
+  cin >> productId;
 
-    bool found = false;
-    for (int i = 0; i < size; i++) {
-        if (products[i].id == productId) {
-            cout << "Product ID: " << products[i].id << endl;
-            cout << "Name: " << products[i].name << endl;
-            cout << "Price: " << products[i].price << " $" << endl;
-            cout << "Quantity: " << products[i].quantity << endl;
-            cout << "Production Date: " << products[i].productiondate.day << "/"
-                << products[i].productiondate.month << "/"
-                << products[i].productiondate.year << endl;
-            cout << "Expiry Date: " << products[i].expirydate.day << "/"
-                << products[i].expirydate.month << "/"
-                << products[i].expirydate.year << endl;
-            found = true;
-            break;
-        }
+  bool found = false;
+  for (int i = 0; i < size; i++)
+  {
+    if (products[i].id == productId)
+    {
+      cout << "Product ID: " << products[i].id << endl;
+      cout << "Name: " << products[i].name << endl;
+      cout << "Price: " << products[i].price << " $" << endl;
+      cout << "Quantity: " << products[i].quantity << endl;
+      cout << "Production Date: " << products[i].productiondate.day << "/"
+           << products[i].productiondate.month << "/"
+           << products[i].productiondate.year << endl;
+      cout << "Expiry Date: " << products[i].expirydate.day << "/"
+           << products[i].expirydate.month << "/"
+           << products[i].expirydate.year << endl;
+      found = true;
+      break;
     }
+  }
 
-    if (!found) {
-        cout << "Product not found!" << endl;
-    }
+  if (!found)
+  {
+    cout << "Product not found!" << endl;
+  }
 }
 
 void signup()
@@ -419,24 +428,25 @@ void displayProductMenu()
 
 void createOrder()
 {
-    int created_order = 0;
-    string choise_product, choise_category, answer;
-    do {
-        cout << "please enter your choise product : ";
-        cin.ignore();
-        getline(cin, choise_product);
-        cout << "please enter your choise category : ";
-        cin.ignore();
-        getline(cin, choise_category);
-        cout << "Do you want to add product ?(yes/no) : ";
-        cin.ignore();
-        getline(cin, answer);
-    } while (answer == "yes");
-    if (answer == "no" || answer == "No" || answer == "NO")
-    {
-        cout << "the order created successfully !" << endl;
-    }
-    created_order++;
+  int created_order = 0;
+  string choise_product, choise_category, answer;
+  do
+  {
+    cout << "please enter your choise product : ";
+    cin.ignore();
+    getline(cin, choise_product);
+    cout << "please enter your choise category : ";
+    cin.ignore();
+    getline(cin, choise_category);
+    cout << "Do you want to add product ?(yes/no) : ";
+    cin.ignore();
+    getline(cin, answer);
+  } while (answer == "yes");
+  if (answer == "no" || answer == "No" || answer == "NO")
+  {
+    cout << "the order created successfully !" << endl;
+  }
+  created_order++;
 }
 
 void saveProductsToFile()
@@ -668,6 +678,50 @@ void MenuAdmin()
       break;
     }
   } while (choice != 6);
+}
+
+void Display_Products_Menu()
+{
+  const string categories[] = {"bakery", "diary", "snacks", "sweets", "beverages", "dry food"};
+  const string products[][5] = {
+      {"phino bread", "balady bread", "lebanese bread", "french bread", "croissant"},
+      {"milk", "cheese", "yogurt", "butter", ""},
+      {"chips", "popcorn", "crackers", "", ""},
+      {"chocolate", "candy", "cake", "cookies", "ice cream"},
+      {"soda", "juice", "water", "coffee", "tea"},
+      {"rice", "pasta", "flour", "sugar", "salt"}};
+
+  cout << "Choose a category:" << endl;
+  for (int i = 0; i < 6; i++)
+  {
+    cout << i + 1 << "-" << categories[i] << endl;
+  }
+
+  int categoryChoice;
+  cin >> categoryChoice;
+
+  if (categoryChoice < 1 || categoryChoice > 6)
+  {
+    cout << "Invalid category choice!" << endl;
+    return;
+  }
+
+  cout << "Select a product from " << categories[categoryChoice - 1] << ":" << endl;
+  for (int i = 0; i < 5 && !products[categoryChoice - 1][i].empty(); i++)
+  {
+    cout << i + 1 << "-" << products[categoryChoice - 1][i] << endl;
+  }
+
+  int productChoice;
+  cin >> productChoice;
+
+  if (productChoice < 1 || productChoice > 5 || products[categoryChoice - 1][productChoice - 1].empty())
+  {
+    cout << "Invalid product choice!" << endl;
+    return;
+  }
+
+  cout << "You selected: " << products[categoryChoice - 1][productChoice - 1] << endl;
 }
 
 int main()
