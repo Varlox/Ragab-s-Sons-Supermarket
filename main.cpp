@@ -160,7 +160,7 @@ void processOrder(int customerId)
     {
       found = true;
       double total = 0;
-      for (int j = 0; j < currentOrder[i].numProducts;)
+      for (int j = 0; j < currentOrder[i].numProducts; j++)
       {
         string p_name = currentOrder[i].productName[j];
         for (int k = 0; k < product_count; k++)
@@ -185,25 +185,25 @@ void processOrder(int customerId)
 void View_product_details(product products[])
 {
   const int size = 30;
-  int productId;
+  string productId;
   cout << "Enter Product ID to view details: ";
   cin >> productId;
 
   bool found = false;
   for (int i = 0; i < size; i++)
   {
-    if (products[i].id == productId)
+    if (products[i].code == productId)
     {
-      cout << "Product ID: " << products[i].id << endl;
+      cout << "Product ID: " << products[i].code << endl;
       cout << "Name: " << products[i].name << endl;
       cout << "Price: " << products[i].price << " $" << endl;
       cout << "Quantity: " << products[i].quantity << endl;
-      cout << "Production Date: " << products[i].productiondate.day << "/"
-           << products[i].productiondate.month << "/"
-           << products[i].productiondate.year << endl;
-      cout << "Expiry Date: " << products[i].expirydate.day << "/"
-           << products[i].expirydate.month << "/"
-           << products[i].expirydate.year << endl;
+      cout << "Production Date: " << products[i].productionDate.day << "/"
+           << products[i].productionDate.month << "/"
+           << products[i].productionDate.year << endl;
+      cout << "Expiry Date: " << products[i].expirationDate.day << "/"
+           << products[i].expirationDate.month << "/"
+           << products[i].expirationDate.year << endl;
       found = true;
       break;
     }
@@ -284,7 +284,6 @@ bool login()
         cout << "Welcome, " << name << "!" << endl;
         loginSuccessful = true;
         return loginSuccessful;
-        break;
       }
     }
     file.close();
@@ -428,25 +427,40 @@ void displayProductMenu()
 
 void createOrder()
 {
-  int created_order = 0;
-  string choise_product, choise_category, answer;
+  order newOrder;
+  newOrder.numProducts = 0;
+  newOrder.totalPrice = 0;
+
+  string productName;
+  char choice;
   do
   {
-    cout << "please enter your choise product : ";
-    cin.ignore();
-    getline(cin, choise_product);
-    cout << "please enter your choise category : ";
-    cin.ignore();
-    getline(cin, choise_category);
-    cout << "Do you want to add product ?(yes/no) : ";
-    cin.ignore();
-    getline(cin, answer);
-  } while (answer == "yes");
-  if (answer == "no" || answer == "No" || answer == "NO")
-  {
-    cout << "the order created successfully !" << endl;
-  }
-  created_order++;
+    cout << "Enter product name: ";
+    cin >> productName;
+
+    bool found = false;
+    for (int i = 0; i < product_count; i++)
+    {
+      if (products[i].name == productName)
+      {
+        found = true;
+        newOrder.productName[newOrder.numProducts++] = productName;
+        newOrder.totalPrice += products[i].price;
+        break;
+      }
+    }
+
+    if (!found)
+    {
+      cout << "Product not found!" << endl;
+    }
+
+    cout << "Do you want to add another product? (y/n): ";
+    cin >> choice;
+  } while (choice == 'y' || choice == 'Y');
+
+  currentOrder[order_count++] = newOrder;
+  cout << "Order created successfully! Total price: $" << newOrder.totalPrice << endl;
 }
 
 void saveProductsToFile()
@@ -487,35 +501,45 @@ void addProduct()
   cout << "Enter product quantity: ";
   cin >> p.quantity;
 
-  // Save the product data to a file
-  saveProductsToFile();
+  products[product_count++] = p; // Add product to the array
+  saveProductsToFile();          // Save all products to the file
   cout << "Product added successfully!" << endl;
-  product_count++;
 }
 
 void editProduct()
 {
-  product p;
+  string codeToEdit;
   cout << "Enter the product code to edit: ";
-  cout << "Enter new product code: ";
-  cin >> p.code;
-  cout << "Enter new product name: ";
-  cin >> p.name;
-  cout << "Enter new product category: ";
-  cin >> p.Category;
-  cout << "Enter new production date (dd mm yyyy): ";
-  cin >> p.productionDate.day >> p.productionDate.month >> p.productionDate.year;
-  cout << "Enter new expiration date (dd mm yyyy): ";
-  cin >> p.expirationDate.day >> p.expirationDate.month >> p.expirationDate.year;
-  cout << "Enter new product price: ";
-  cin >> p.price;
-  cout << "Enter new product quantity: ";
-  cin >> p.quantity;
+  cin >> codeToEdit;
 
-  // Save the updated product data to a file
+  bool found = false;
+  for (int i = 0; i < product_count; i++)
+  {
+    if (products[i].code == codeToEdit)
+    {
+      found = true;
+      cout << "Editing product with code " << codeToEdit << endl;
+      cout << "Enter new product name: ";
+      cin >> products[i].name;
+      cout << "Enter new product category: ";
+      cin >> products[i].Category;
+      cout << "Enter new production date (dd mm yyyy): ";
+      cin >> products[i].productionDate.day >> products[i].productionDate.month >> products[i].productionDate.year;
+      cout << "Enter new expiration date (dd mm yyyy): ";
+      cin >> products[i].expirationDate.day >> products[i].expirationDate.month >> products[i].expirationDate.year;
+      cout << "Enter new product price: ";
+      cin >> products[i].price;
+      cout << "Enter new product quantity: ";
+      cin >> products[i].quantity;
+      break;
+    }
+  }
+
+  if (!found)
+  {
+    cout << "Product with code " << codeToEdit << " not found." << endl;
+  }
   saveProductsToFile();
-  cout << "Product updated successfully!" << endl;
-  product_count++;
 }
 
 void deleteProduct()
@@ -554,13 +578,14 @@ void deleteProduct()
   }
   infile.close();
   tempFile.close();
-  product_count--;
 
-  // Replace the original file with the updated file
-  remove("products.txt");
-  rename("temp.txt", "products.txt");
-
-  if (!found)
+  if (found)
+  {
+    product_count--;
+    remove("products.txt");
+    rename("temp.txt", "products.txt");
+  }
+  else
   {
     cout << "Product with code " << codeToDelete << " not found." << endl;
   }
@@ -665,10 +690,13 @@ void MenuAdmin()
       showAllProducts();
       break;
     case 5:
-      viewOrder();
+      viewOrders_admin();
       break;
     case 6:
-      processOrder();
+      int customerId;
+      cout << "Enter customer ID to process order: ";
+      cin >> customerId;
+      processOrder(customerId);
       break;
     case 7:
       cout << "Exiting..." << endl;
@@ -677,7 +705,7 @@ void MenuAdmin()
       cout << "Invalid choice. Please try again." << endl;
       break;
     }
-  } while (choice != 6);
+  } while (choice != 7);
 }
 
 void Display_Products_Menu()
@@ -745,10 +773,7 @@ int main()
       if (login())
       {
         MenuLogin();
-        break;
       }
-      else
-        login();
       break;
     case 3:
       MenuAdmin();
