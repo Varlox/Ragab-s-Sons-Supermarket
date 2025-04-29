@@ -258,10 +258,8 @@ void signup()
   }
 }
 
-bool login()
+bool login(string inputId, string inputPassword)
 {
-  string inputId;
-  string inputPassword;
   bool loginSuccessful = false;
 
   cout << "Enter your ID: ";
@@ -270,84 +268,75 @@ bool login()
   cout << "Enter your password: ";
   cin >> inputPassword;
 
-  ifstream file("customers.txt");
-  if (file.is_open())
+  for (int i = 0; i < customer_count; i++)
   {
-    string id;
-    string password, name, phone, location;
-
-    while (file >> id >> password >> name >> phone >> location)
+    if (customers[i].Id == inputId && customers[i].password == inputPassword)
     {
-      if (id == inputId && password == inputPassword)
-      {
-        cout << "Login successful!" << endl;
-        cout << "Welcome, " << name << "!" << endl;
-        loginSuccessful = true;
-        return loginSuccessful;
-      }
-    }
-    file.close();
-
-    if (!loginSuccessful)
-    {
-      cout << "Invalid ID or password." << endl;
-      cout << "Please try again." << endl;
+      cout << "Login successful!" << endl;
+      cout << "Welcome, " << customers[i].name << "!" << endl;
+      loginSuccessful = true;
+      break;
     }
   }
-  else
-  {
-    cerr << "Error: Unable to open file to verify login." << endl;
-  }
+
+  // ifstream file("customers.txt");
+  // if (file.is_open())
+  // {
+  //   string id;
+  //   string password, name, phone, location;
+
+  //   while (file >> id >> password >> name >> phone >> location)
+  //   {
+  //     if (id == inputId && password == inputPassword)
+  //     {
+  //       cout << "Login successful!" << endl;
+  //       cout << "Welcome, " << name << "!" << endl;
+  //       loginSuccessful = true;
+  //       return loginSuccessful;
+  //     }
+  //   }
+  //   file.close();
+
+  //   if (!loginSuccessful)
+  //   {
+  //     cout << "Invalid ID or password." << endl;
+  //     cout << "Please try again." << endl;
+  //   }
+  // }
+  // else
+  // {
+  //   cerr << "Error: Unable to open file to verify login." << endl;
+  // }
 }
-
-void editCustomerData()
+void editCustomerData(string idToEdit)
 {
-  string idToEdit;
   cout << "Enter the ID of the customer to edit: ";
   cin >> idToEdit;
 
-  ifstream infile("customers.txt");
-  ofstream tempFile("temp.txt");
-  if (infile.is_open() && tempFile.is_open())
+  bool found = false;
+
+  for (int i = 0; i < customer_count; i++)
   {
-    string id, password, name, phone, location;
-    bool found = false;
-
-    while (infile >> id >> password >> name >> phone >> location)
+    if (customers[i].Id == idToEdit)
     {
-      if (id == idToEdit)
-      {
-        found = true;
-        cout << "Editing customer data for ID: " << id << endl;
-        cout << "Enter new password: ";
-        cin >> password;
-        cout << "Enter new name: ";
-        cin >> name;
-        cout << "Enter new phone number: ";
-        cin >> phone;
-        cout << "Enter new location: ";
-        cin >> location;
-      }
-      tempFile << id << " " << password << " " << name << " " << phone << " " << location << endl;
-    }
-    infile.close();
-    tempFile.close();
-
-    remove("customers.txt");
-    rename("temp.txt", "customers.txt");
-
-    if (found)
-    {
+      found = true;
+      cout << "Editing customer data for ID: " << idToEdit << endl;
+      cout << "Enter new password: ";
+      cin >> customers[i].password;
+      cout << "Enter new name: ";
+      cin >> customers[i].name;
+      cout << "Enter new phone number: ";
+      cin >> customers[i].phone;
+      cout << "Enter new location: ";
+      cin >> customers[i].location;
       cout << "Customer data updated successfully." << endl;
-    }
-    else
-    {
-      cout << "Customer ID not found." << endl;
+      break;
     }
   }
-  else
+
+  if (!found)
   {
-    cerr << "Error: Unable to open file." << endl;
+    cout << "Customer ID not found." << endl;
   }
 }
 
