@@ -491,10 +491,8 @@ void addProduct()
   cin >> p.quantity;
 
   products[product_count++] = p; // Add product to the array
-  saveProductsToFile();          // Save all products to the file
   cout << "Product added successfully!" << endl;
 }
-
 void editProduct()
 {
   string codeToEdit;
@@ -520,61 +518,41 @@ void editProduct()
       cin >> products[i].price;
       cout << "Enter new product quantity: ";
       cin >> products[i].quantity;
+      cout << "Product updated successfully!" << endl;
       break;
     }
   }
 
   if (!found)
   {
-    cout << "Product with code " << codeToEdit << " not found." << endl;
+    cout << "Product with code " << codeToEdit << " not found in the array." << endl;
   }
-  saveProductsToFile();
 }
-
-void deleteProduct()
+void deleteProduct(string codeToDelete)
 {
-  string codeToDelete;
+
   cout << "Enter the product code to delete: ";
   cin >> codeToDelete;
 
-  ifstream infile("products.txt");
-  ofstream tempFile("temp.txt");
-
-  if (!infile.is_open() || !tempFile.is_open())
-  {
-    cerr << "Error: Unable to open file." << endl;
-    return;
-  }
-
   bool found = false;
-  product p;
 
-  while (infile >> p.code >> p.name >> p.Category >> p.productionDate.day >> p.productionDate.month >> p.productionDate.year >> p.expirationDate.day >> p.expirationDate.month >> p.expirationDate.year >> p.price >> p.quantity)
+  for (int i = 0; i < product_count; i++)
   {
-    if (p.code == codeToDelete)
+    if (products[i].code == codeToDelete)
     {
       found = true;
+      // Shift all products after the found product one position to the left
+      for (int j = i; j < product_count - 1; j++)
+      {
+        products[j] = products[j + 1];
+      }
+      product_count--; // Decrease the product count
       cout << "Product with code " << codeToDelete << " has been deleted." << endl;
-    }
-    else
-    {
-      // Write all other products to the temp file
-      tempFile << p.code << " " << p.name << " " << p.Category << " "
-               << p.productionDate.day << " " << p.productionDate.month << " " << p.productionDate.year << " "
-               << p.expirationDate.day << " " << p.expirationDate.month << " " << p.expirationDate.year << " "
-               << p.price << " " << p.quantity << endl;
+      break;
     }
   }
-  infile.close();
-  tempFile.close();
 
-  if (found)
-  {
-    product_count--;
-    remove("products.txt");
-    rename("temp.txt", "products.txt");
-  }
-  else
+  if (!found)
   {
     cout << "Product with code " << codeToDelete << " not found." << endl;
   }
