@@ -333,7 +333,7 @@ void viewOrders_admin()
   }
 }
 
-int MenuAdmin()
+void MenuAdmin()
 {
   string choice;
   bool running = true;
@@ -377,47 +377,101 @@ int MenuAdmin()
     }
     else if (choice == "6")
     {
-
-      cout << "Exiting..." << endl;
-      return 0;
+      // Save all products before exiting the admin menu
+      saveProductsToFile();
+      cout << "Exiting admin menu... All changes have been saved." << endl;
+      running = false;
     }
     else
     {
       cout << "Invalid choice. Please try again." << endl;
     }
   }
-  while (choice != "6")
-    ;
 }
 
 void editCustomerData(string idToEdit)
 {
+  ifstream infile("customers.txt");
+  ofstream tempFile("temp.txt");
 
+  if (!infile.is_open())
+  {
+    cerr << "Error: Unable to open 'customers.txt' for reading." << endl;
+    return;
+  }
+  if (!tempFile.is_open())
+  {
+    cerr << "Error: Unable to open 'temp.txt' for writing." << endl;
+    return;
+  }
+
+  string id, password, name, phone, location;
   bool found = false;
 
-  for (int i = 0; i < customer_count; i++)
+  while (infile >> id >> password >> name >> phone >> location)
   {
-    if (customers[i].Id == idToEdit)
+    if (id == idToEdit)
     {
       found = true;
-      cout << "Editing customer data for ID: " << idToEdit << endl;
-      cout << "Enter new password: ";
-      cin >> customers[i].password;
-      cout << "Enter new name: ";
-      cin >> customers[i].name;
-      cout << "Enter new phone number: ";
-      cin >> customers[i].phone;
-      cout << "Enter new location: ";
-      cin >> customers[i].location;
-      cout << "Customer data updated successfully." << endl;
-      break;
+      cout << "Editing customer data for ID: " << id << endl;
+
+      cout << "Enter new password (or press Enter to keep current): ";
+      string newPassword;
+      cin.ignore();
+      getline(cin, newPassword);
+      if (!newPassword.empty())
+      {
+        password = newPassword;
+      }
+
+      cout << "Enter new name (or press Enter to keep current): ";
+      string newName;
+      getline(cin, newName);
+      if (!newName.empty())
+      {
+        name = newName;
+      }
+
+      cout << "Enter new phone number (or press Enter to keep current): ";
+      string newPhone;
+      getline(cin, newPhone);
+      if (!newPhone.empty())
+      {
+        phone = newPhone;
+      }
+
+      cout << "Enter new location (or press Enter to keep current): ";
+      string newLocation;
+      getline(cin, newLocation);
+      if (!newLocation.empty())
+      {
+        location = newLocation;
+      }
     }
+    tempFile << id << " " << password << " " << name << " " << phone << " " << location << endl;
   }
+
+  infile.close();
+  tempFile.close();
 
   if (!found)
   {
     cout << "Customer ID not found." << endl;
+    return;
   }
+
+  if (remove("customers.txt") != 0)
+  {
+    cerr << "Error: Unable to delete the original 'customers.txt' file." << endl;
+    return;
+  }
+  if (rename("temp.txt", "customers.txt") != 0)
+  {
+    cerr << "Error: Unable to rename 'temp.txt' to 'customers.txt'." << endl;
+    return;
+  }
+
+  cout << "Customer data updated successfully." << endl;
 }
 
 /* void Display_Products_Menu() // user
@@ -585,7 +639,7 @@ void displayProductMenu()
   }
 }
 
-int user_menu()
+void user_menu()
 {
   string choice;
 
@@ -640,14 +694,13 @@ int user_menu()
     else if (choice == "7")
     {
       cout << "Logging out..." << endl;
-      return 0;
     }
     else
     {
       cout << "Invalid choice. Please try again." << endl;
     }
-    choice = "";
-  } while (choice != "7");
+
+  } while (choice != "7"); // Loop will now exit correctly when "7" is entered.
 }
 
 bool login()
@@ -728,12 +781,13 @@ int main()
     }
     else if (choice == "2")
     {
-
       login();
     }
     else if (choice == "3")
     {
-      cout << "Exiting..." << endl;
+      // Save all products to 'the file before exiting
+      saveProductsToFile();
+      cout << "Exiting... All products have been saved." << endl;
       break;
     }
     else
