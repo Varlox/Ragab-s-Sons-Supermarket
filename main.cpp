@@ -283,6 +283,37 @@ void showAllProducts()
   }
 }
 
+void showAllProductsPaginated()
+{
+  const int itemsPerPage = 5;
+  int currentPage = 0;
+
+  while (true)
+  {
+    int start = currentPage * itemsPerPage;
+    int end = min(start + itemsPerPage, product_count);
+
+    cout << "Products (Page " << currentPage + 1 << "):" << endl;
+    for (int i = start; i < end; i++)
+    {
+      cout << i + 1 << ". " << products[i].name << " - $" << products[i].price << endl;
+    }
+
+    if (end == product_count)
+    {
+      cout << "End of list." << endl;
+      break;
+    }
+
+    cout << "Press 'n' for next page or 'q' to quit: ";
+    char choice;
+    cin >> choice;
+    if (choice == 'q')
+      break;
+    currentPage++;
+  }
+}
+
 void createOrder(string inputId)
 {
   if (order_count >= Max)
@@ -631,7 +662,7 @@ void user_menu(string inputId, string name)
     cout << "-----------------------------------------" << endl;
 
     cout << "1. Edit Customer Data" << endl;
-    cout << "2. Display All Products" << endl;
+    cout << "2. Display All Products " << endl; // New option for paginated view
     cout << "3. Create Order" << endl;
     cout << "4. View Your Orders" << endl;
     cout << "5. Browse Products by Category" << endl;
@@ -646,10 +677,10 @@ void user_menu(string inputId, string name)
       cout << "\n--- Edit Customer Data ---" << endl;
       editCustomerData(inputId);
     }
-    else if (choice == "2")
+    else if (choice == "2") // Call the paginated function
     {
-      cout << "\n--- Display All Products ---" << endl;
-      showAllProducts();
+      cout << "\n--- Display All Products (Paginated) ---" << endl;
+      showAllProductsPaginated();
     }
     else if (choice == "3")
     {
@@ -683,7 +714,7 @@ void user_menu(string inputId, string name)
 
     cout << "-----------------------------------------" << endl;
 
-  } while (choice != "7");
+  } while (choice != "8");
 }
 
 void login()
