@@ -93,7 +93,7 @@ void saveToFile()
   ofstream orderfile("orders.txt");
   if (!orderfile.is_open())
   {
-    cerr << "\033[1;31mError: Unable to open file to save orders.\033[0m" << endl;
+    cerr << "Error: Unable to open file to save orders." << endl;
     return;
   }
   for (int i = 0; i < order_count; i++)
@@ -935,22 +935,37 @@ bool loadAllFromFile()
   ifstream orderfile("orders.txt");
   if (!orderfile.is_open())
   {
-
     cerr << "Error: Unable to open orders.txt for loading." << endl;
+    return false;
   }
+
   order_count = 0;
-  while (orderfile.peek() != EOF)
+  while (orderfile >> currentOrder[order_count].customerId)
   {
-    orderfile >> currentOrder[order_count].customerId;
-    orderfile >> currentOrder[order_count].numProducts;
-    orderfile >> currentOrder[order_count].totalPrice;
+    if (!(orderfile >> currentOrder[order_count].numProducts >> currentOrder[order_count].totalPrice))
+    {
+      cerr << "Error: Invalid data format in orders.txt." << endl;
+      break;
+    }
+
     for (int j = 0; j < currentOrder[order_count].numProducts; j++)
     {
-      orderfile >> currentOrder[order_count].productName[j];
+      if (!(orderfile >> currentOrder[order_count].productName[j]))
+      {
+        cerr << "Error: Invalid product data in orders.txt." << endl;
+        break;
+      }
     }
+
     order_count++;
+    if (order_count >= Max)
+    {
+      cerr << "Warning: Maximum order limit reached while loading." << endl;
+      break;
+    }
   }
 
+  orderfile.close();
   return true;
 }
 
