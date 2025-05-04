@@ -1,20 +1,20 @@
 #include <iostream>
 #include <string>
 #include <fstream>
-#include <limits>
+#include<limits>
+
 using namespace std;
 
 const int Max = 100;
 
 struct customer
 {
-    string Id; // Change from int to string
+    string Id;
     string password;
     string name;
     string phone;
     string location;
 };
-
 
 customer customers[Max];
 int customer_count = 0;
@@ -37,21 +37,91 @@ struct product
 
 product products[Max];
 int product_count = 0;
-int order_count;
+int order_count = 0;
+
 struct order
 {
-
     int customerId;
     string productName[Max];
     double totalPrice;
     int numProducts;
-}currentOrder[Max];
+} currentOrder[Max];
 
+void saveToFile()
+{
+    // Save customers to file
+    ofstream file("customers.txt");
+    if (file.is_open()) {
+        for (int i = 0; i < customer_count; i++) {
+            file << customers[i].Id << " "
+                << customers[i].password << " "
+                << customers[i].name << " "
+                << customers[i].phone << " "
+                << customers[i].location << endl;
+        }
+        file.close();
+        cout << "Data saved to file successfully." << endl;
+    }
+    else {
+        cerr << "Error: Unable to open file for saving." << endl;
+    }
+
+    // Save products to file
+    ofstream filee("products.txt");
+    if (!filee.is_open())
+    {
+        cerr << "Error: Unable to open file to save products." << endl;
+        return;
+    }
+
+    for (int i = 0; i < product_count; i++)
+    {
+        filee << products[i].code << " " << products[i].name << " " << products[i].Category << " "
+            << products[i].productionDate.day << " " << products[i].productionDate.month << " " << products[i].productionDate.year << " "
+            << products[i].expirationDate.day << " " << products[i].expirationDate.month << " " << products[i].expirationDate.year << " "
+            << products[i].price << " " << products[i].quantity << endl;
+    }
+
+    filee.close();
+
+	// Save products to file
+
+	ofstream orderfile("orders.txt");
+	if (!orderfile.is_open())
+	{
+		cerr << "Error: Unable to open file to save orders." << endl;
+		return;
+	}
+	for (int i = 0;i < order_count;i++)
+	{
+		orderfile << currentOrder[i].customerId << " " << currentOrder[i].numProducts << " " << currentOrder[i].totalPrice << endl;
+		for (int j = 0;j < currentOrder[i].numProducts;j++)
+		{
+			orderfile << currentOrder[i].productName[j] << " ";
+		}
+		orderfile << endl;
+	}
+
+	orderfile.close();
+}
 void signup()
 {
+    if (customer_count >= Max) {
+        cout << "Error: Customer limit reached." << endl;
+        return;
+    }
+
     customer c;
     cout << "Enter your ID: ";
     cin >> c.Id;
+
+    // Check for duplicate ID
+    for (int i = 0; i < customer_count; i++) {
+        if (customers[i].Id == c.Id) {
+            cout << "Error: ID already exists. Please use a different ID." << endl;
+            return;
+        }
+    }
 
     cout << "Enter your password: ";
     cin >> c.password;
@@ -62,146 +132,127 @@ void signup()
     cout << "Enter your location: ";
     cin >> c.location;
 
-    // Check for duplicate ID
-    ifstream infile("customers.txt");
-    string existingId;
-    string password, name, phone, location;
-    cin.ignore();
-    while (infile >> existingId >> password >> name >> phone >> location)
-    {
-        if (existingId == c.Id)
-        {
-            cout << "Error: ID already exists. Please use a different ID." << endl;
-            return;
-        }
-    }
-    infile.close();
+    // Add new customer to array
+    customers[customer_count++] = c;
 
-    // Save the customer data to a file
-    ofstream file("customers.txt", ios::app);
-    if (file.is_open())
-    {
-        file << c.Id << " " << c.password << " " << c.name << " " << c.phone << " " << c.location << endl;
-        file.close();
-        cout << "Signup successful! Data saved to file." << endl;
-    }
-    else
-    {
-        cerr << "Error: Unable to open file to save data." << endl;
-    }
-}
-void saveProductsToFile()
-{
-    ofstream file("products.txt");
-    if (!file.is_open())
-    {
-        cerr << "Error: Unable to open file to save products." << endl;
-        return;
-    }
-
-    for (int i = 0; i < product_count; i++)
-    {
-        file << products[i].code << " " << products[i].name << " " << products[i].Category << " "
-            << products[i].productionDate.day << " " << products[i].productionDate.month << " " << products[i].productionDate.year << " "
-            << products[i].expirationDate.day << " " << products[i].expirationDate.month << " " << products[i].expirationDate.year << " "
-            << products[i].price << " " << products[i].quantity << endl;
-    }
-
-    file.close();
+    cout << "Signup successful!" << endl;
+   
 }
 void addProduct()
 {
-    product p;
-    cout << "Enter product code: ";
-    cin >> p.code;
-    cout << "Enter product name: ";
-    cin.ignore();
-    getline(cin, p.name);
-    cout << "Enter product category: ";
-    cin.ignore();
-    getline(cin, p.Category);
-    cout << "Enter production date (dd mm yyyy): ";
-    cin >> p.productionDate.day >> p.productionDate.month >> p.productionDate.year;
-    cout << "Enter expiration date (dd mm yyyy): ";
-    cin >> p.expirationDate.day >> p.expirationDate.month >> p.expirationDate.year;
-    cout << "Enter product price: ";
-    cin >> p.price;
-    cout << "Enter product quantity: ";
-    cin >> p.quantity;
-    products[product_count] = p;
-
-    // Save the product data to a file
-    saveProductsToFile();
-    cout << "Product added successfully!" << endl;
-    product_count++;
-}
-void editProduct()
-{
-    product p;
-    cout << "Enter the product code to edit: ";
-    cout << "Enter new product code: ";
-    cin >> p.code;
-    cout << "Enter new product name: ";
-    cin.ignore();
-    getline(cin, p.name);
-    cout << "Enter new product category: ";
-    cin.ignore();
-    getline(cin, p.Category);
-    cout << "Enter new production date (dd mm yyyy): ";
-    cin >> p.productionDate.day >> p.productionDate.month >> p.productionDate.year;
-    cout << "Enter new expiration date (dd mm yyyy): ";
-    cin >> p.expirationDate.day >> p.expirationDate.month >> p.expirationDate.year;
-    cout << "Enter new product price: ";
-    cin >> p.price;
-    cout << "Enter new product quantity: ";
-    cin >> p.quantity;
-
-    // Save the updated product data to a file
-    saveProductsToFile();
-    cout << "Product updated successfully!" << endl;
-    product_count++;
-}
-void deleteProduct()
-{
-    string codeToDelete;
-    cout << "Enter the product code to delete: ";
-    cin >> codeToDelete;
-
-    ifstream infile("products.txt");
-    ofstream tempFile("temp.txt");
-
-    if (!infile.is_open() || !tempFile.is_open())
+    if (product_count >= Max)
     {
-        cerr << "Error: Unable to open file." << endl;
+        cout << "Error: Cannot add more products. Maximum limit reached." << endl;
         return;
     }
 
-    bool found = false;
     product p;
+    cout << "Enter product code: ";
+    cin >> p.code;
+    cin.ignore();
+    cout << "Enter product name: ";
+    //cin.ignore();
+    getline(cin, p.name); // Fixed to handle multi-word product names
 
-    while (infile >> p.code >> p.name >> p.Category >> p.productionDate.day >> p.productionDate.month >> p.productionDate.year >> p.expirationDate.day >> p.expirationDate.month >> p.expirationDate.year >> p.price >> p.quantity)
+    // Predefined categories
+    const string categories[] = { "Bakery", "Dairy", "Snacks", "Sweets", "Beverages" };
+    int categoryChoice;
+
+    while (true)
     {
-        if (p.code == codeToDelete)
+        cout << "Choose a category:" << endl;
+        for (int i = 0; i < 5; i++)
         {
-            found = true;
-            cout << "Product with code " << codeToDelete << " has been deleted." << endl;
+            cout << i + 1 << ". " << categories[i] << endl;
+        }
+
+        cin >> categoryChoice;
+
+        if (categoryChoice >= 1 && categoryChoice <= 5)
+        {
+            p.Category = categories[categoryChoice - 1];
+            break;
         }
         else
         {
-            // Write all other products to the temp file
-            tempFile << p.code << " " << p.name << " " << p.Category << " "
-                << p.productionDate.day << " " << p.productionDate.month << " " << p.productionDate.year << " "
-                << p.expirationDate.day << " " << p.expirationDate.month << " " << p.expirationDate.year << " "
-                << p.price << " " << p.quantity << endl;
+            cout << "Invalid category choice! Please try again." << endl;
         }
     }
-    infile.close();
-    tempFile.close();
-    product_count--;
 
-    // Replace the original file with the updated file
-    remove("products.txt");
-    rename("temp.txt", "products.txt");
+    cout << "Enter production date (dd mm yyyy): ";
+    cin >> p.productionDate.day >> p.productionDate.month >> p.productionDate.year;
+
+    cout << "Enter expiration date (dd mm yyyy): ";
+    cin >> p.expirationDate.day >> p.expirationDate.month >> p.expirationDate.year;
+
+    cout << "Enter product price: ";
+    cin >> p.price;
+
+    cout << "Enter product quantity: ";
+    cin >> p.quantity;
+
+    // Add the product to the array
+    products[product_count++] = p;
+
+
+    cout << "Product added successfully!" << endl;
+    //product_count++;
+}
+
+void editProduct()
+{
+    string codeToEdit;
+    cout << "Enter the product code to edit: ";
+    cin >> codeToEdit;
+
+    bool found = false;
+
+    for (int i = 0; i < product_count; i++)
+    {
+        if (products[i].code == codeToEdit)
+        {
+            found = true;
+            cout << "Enter new product name: ";
+            cin >> products[i].name;
+            cout << "Enter new product category: ";
+            cin >> products[i].Category;
+            cout << "Enter new production date (dd mm yyyy): ";
+            cin >> products[i].productionDate.day >> products[i].productionDate.month >> products[i].productionDate.year;
+            cout << "Enter new expiration date (dd mm yyyy): ";
+            cin >> products[i].expirationDate.day >> products[i].expirationDate.month >> products[i].expirationDate.year;
+            cout << "Enter new product price: ";
+            cin >> products[i].price;
+            cout << "Enter new product quantity: ";
+            cin >> products[i].quantity;
+            cout << "Product updated successfully!" << endl;
+            break;
+        }
+    }
+
+    if (!found)
+    {
+        cout << "Product with code " << codeToEdit << " not found in the array." << endl;
+    }
+}
+void deleteProduct(string codeToDelete)
+{
+    bool found = false;
+
+    for (int i = 0; i < product_count; i++)
+    {
+        if (products[i].code == codeToDelete)
+        {
+            found = true;
+            // Shift all products after the found product one position to the left
+            for (int j = i; j < product_count - 1; j++)
+            {
+                products[j] = products[j + 1];
+            }
+            product_count--; // Decrease the product count
+            cout << "Product with code " << codeToDelete << " has been deleted." << endl;
+            break;
+        }
+    }
 
     if (!found)
     {
@@ -213,7 +264,8 @@ void showAllProducts()
 {
     cout << "All Products:" << endl;
     cout << "--------------------------------------" << endl;
-    for (int i = 0; i < product_count; ++i) {
+    for (int i = 0; i < product_count; ++i)
+    {
         cout << "Code: " << products[i].code << endl;
         cout << "Name: " << products[i].name << endl;
         cout << "Production Date: " << products[i].productionDate.day << "/"
@@ -222,30 +274,53 @@ void showAllProducts()
             << products[i].expirationDate.month << "/" << products[i].expirationDate.year << endl;
         cout << "Price: $" << products[i].price << endl;
         cout << "*" << endl;
-        saveProductsToFile();
+
     }
 }
 
 void createOrder()
 {
-    string choise_product, choise_category, answer;
+    order newOrder;
+    newOrder.numProducts = 0;
+    newOrder.totalPrice = 0;
 
+    cout << "Enter your customer ID: ";
+    cin >> newOrder.customerId;
 
-    do {
-        cout << "please enter your choise product : ";
-        cin.ignore();
-        getline(cin, choise_product);
-        cout << "please enter your choise category : ";
-        cin.ignore();
-        getline(cin, choise_category);
-        cout << "Do you want to add product ?(yes/no) : ";
-        getline(cin, answer);
-    } while ((answer == "yes") || (answer == "YES") || (answer == "Yes"));
-    if ((answer == "no") || (answer == "NO") || (answer == "No")) {
-        cout << " The order created successfully ! ";
+    string productName;
+    string choice;
+    while (true)
+    {
+        cout << "Enter product name: ";
+        cin >> productName;
+
+        bool found = false;
+        for (int i = 0; i < product_count; i++)
+        {
+            if (products[i].name == productName)
+            {
+                found = true;
+                newOrder.productName[newOrder.numProducts++] = productName;
+                newOrder.totalPrice += products[i].price;
+                break;
+            }
+        }
+
+        if (!found)
+        {
+            cout << "Product not found!" << endl;
+        }
+
+        cout << "Do you want to add another product? (y/n): ";
+        cin >> choice;
+        if (choice == "n" || choice == "N")
+            break;
     }
-    order_count++;
+
+    currentOrder[order_count++] = newOrder;
+    cout << "Order created successfully! Total price: $" << newOrder.totalPrice << endl;
 }
+
 void searchProductByName(const string& name)
 {
     bool found = false;
@@ -265,16 +340,17 @@ void searchProductByName(const string& name)
         cout << "Product not found." << endl;
     }
 }
-void viewOrders_admin() {
-    int order_count;
-    cin >> order_count;
+void viewOrders_admin()
+{
+
     if (order_count == 0)
     {
         cout << "No orders to display." << endl;
         return;
     }
 
-    for (int i = 0;i < order_count;i++) {
+    for (int i = 0; i < order_count; i++)
+    {
         cout << "\nOrder #" << i + 1 << " for Customer ID: " << currentOrder[i].customerId << endl;
         cout << "Products: ";
         for (int j = 0; j < currentOrder[i].numProducts; j++)
@@ -286,11 +362,13 @@ void viewOrders_admin() {
         cout << "\nTotal Price: $" << currentOrder[i].totalPrice << endl;
     }
 }
+
 void MenuAdmin()
 {
     string choice;
+    bool running = true;
 
-    while (true)
+    while (running)
     {
         cout << endl;
         cout << "****** Welcome to Ragab`s Sons Supermarket ******" << endl;
@@ -300,11 +378,9 @@ void MenuAdmin()
         cout << "3. Delete Product" << endl;
         cout << "4. Show All Products" << endl;
         cout << "5. View Orders" << endl;
-        cout << "6. Return to Main Menu" << endl;
+        cout << "6. Exit" << endl;
         cout << "Enter your choice: ";
-
         cin >> choice;
-        cin.ignore();
 
         if (choice == "1")
         {
@@ -316,7 +392,10 @@ void MenuAdmin()
         }
         else if (choice == "3")
         {
-            deleteProduct();
+            string codeToDelete;
+            cout << "Enter the product code to delete: ";
+            cin >> codeToDelete;
+            deleteProduct(codeToDelete);
         }
         else if (choice == "4")
         {
@@ -328,8 +407,10 @@ void MenuAdmin()
         }
         else if (choice == "6")
         {
-            cout << "Returning to Main Menu..." << endl;
-            return; // Goes back to login(), which goes back to main()
+            // Save all products before exiting the admin menu
+            saveToFile();
+            cout << "Exiting admin menu... All changes have been saved." << endl;
+            running = false;
         }
         else
         {
@@ -337,80 +418,55 @@ void MenuAdmin()
         }
     }
 }
-void editCustomerData()
-{
-    string idToEdit;
-    cout << "Enter the ID of the customer to edit: ";
-    cin >> idToEdit;
 
-    ifstream infile("customers.txt");
-    ofstream tempFile("temp.txt");
-    if (infile.is_open() && tempFile.is_open())
-    {
-        string id, password, name, phone, location;
-        bool found = false;
-
-        while (infile >> id >> password >> name >> phone >> location)
-        {
-            if (id == idToEdit)
-            {
-                found = true;
-                cout << "Editing customer data for ID: " << id << endl;
-                cout << "Enter new password: ";
-                cin >> password;
-                cout << "Enter new name: ";
-                cin >> name;
-                cout << "Enter new phone number: ";
-                cin >> phone;
-                cout << "Enter new location: ";
-                cin >> location;
-            }
-            tempFile << id << " " << password << " " << name << " " << phone << " " << location << endl;
-        }
-        infile.close();
-        tempFile.close();
-
-        remove("customers.txt");
-        rename("temp.txt", "customers.txt");
-
-        if (found)
-        {
-            cout << "Customer data updated successfully." << endl;
-        }
-        else
-        {
-            cout << "Customer ID not found." << endl;
-        }
-    }
-    else
-    {
-        cerr << "Error: Unable to open file." << endl;
-    }
-}
-void displayProductMenu()
-{
-    if (product_count == 0)
-    {
-        cout << "No products available in the supermarket." << endl;
-        return;
-    }
-    for (int i = 0; i < product_count;++i) {
-        cout << i + 1 << ". " << products[i].name << endl;
-        cout << "   Code: " << products[i].code << endl;
-        cout << "   Price: $" << products[i].price << endl;
-        cout << "   Quantity: " << products[i].quantity << endl;
-        cout << "   Production Date: " << products[i].productionDate.day << "/"
-            << products[i].productionDate.month << "/" << products[i].productionDate.year << endl;
-        cout << "   Expiration Date: " << products[i].expirationDate.day << "/"
-            << products[i].expirationDate.month << "/" << products[i].expirationDate.year << endl;
-        cout << "--------------------------------------" << endl;
-    }
-}
-void viewOrder_user() {
-    int IDindex;
+void editCustomerData(string idToEdit) {
     bool found = false;
-    cout << "Please enter your ID : ";
-    cin >> IDindex;
+
+    // Clean whitespace or leftover newline before using getline
+    cin.ignore();
+
+    for (int i = 0; i < customer_count; i++) {
+        if (customers[i].Id == idToEdit) {
+            found = true;
+            cout << "Editing customer data for ID: " << customers[i].Id << endl;
+
+            string newPassword, newName, newPhone, newLocation;
+
+            cout << "Enter new password (or press Enter to keep current): ";
+            getline(cin, newPassword);
+            if (!newPassword.empty())
+                customers[i].password = newPassword;
+
+            cout << "Enter new name (or press Enter to keep current): ";
+            getline(cin, newName);
+            if (!newName.empty())
+                customers[i].name = newName;
+
+            cout << "Enter new phone number (or press Enter to keep current): ";
+            getline(cin, newPhone);
+            if (!newPhone.empty())
+                customers[i].phone = newPhone;
+
+            cout << "Enter new location (or press Enter to keep current): ";
+            getline(cin, newLocation);
+            if (!newLocation.empty())
+                customers[i].location = newLocation;
+
+            saveToFile();
+            cout << "Customer data updated successfully." << endl;
+            return;
+        }
+    }
+
+    if (!found) {
+        cout << "Customer ID not found." << endl;
+    }
+}
+
+void viewOrder_user(int IDindex)
+{
+
+    bool found = false;
     for (int i = 0; i < order_count; i++)
     {
         if (currentOrder[i].customerId == IDindex)
@@ -427,70 +483,93 @@ void viewOrder_user() {
             cout << "\nTotal price: $" << currentOrder[i].totalPrice << endl;
         }
     }
-    if (!found) {
-        cout << "This user has no order yet . " << endl;
-        return;
-    }
-}
-
-void processOrder()
-{
-    int customerId;
-    cout << "Please enter your ID :";
-    cin >> customerId;
-    bool found = false;
-
-    for (int i = 0; i < order_count; i++)
-    {
-        if (currentOrder[i].customerId == customerId)
-        {
-            found = true;
-            double total = 0;
-            for (int j = 0; j < currentOrder[i].numProducts;)
-            {
-                string p_name = currentOrder[i].productName[j];
-                for (int k = 0; k < product_count; k++)
-                {
-                    if (products[k].name == p_name)
-                    {
-                        total += products[k].price;
-                        break;
-                    }
-                }
-            }
-            cout << "Total price : " << total << endl;
-            break;
-        }
-
-    }
     if (!found)
     {
-        cout << "This user has no order yet . " << endl;
+        cout << "there is no order created. " << endl;
+        return;
     }
 }
-void print_products() {
-    if (product_count == 0) {
-        cout << "No available products" << endl;
-        return;
 
+void displayProductMenu()
+{
+    if (product_count == 0)
+    {
+        cout << "No products available in the supermarket." << endl;
+        return;
     }
-    for (int i = 0; i < product_count; ++i) {
-        cout << "Code: " << products[i].code << endl;
-        cout << "Name: " << products[i].name << endl;
-        cout << "Production Date: " << products[i].productionDate.day << "/"
-            << products[i].productionDate.month << "/" << products[i].productionDate.year << endl;
-        cout << "Expiration Date: " << products[i].expirationDate.day << "/"
-            << products[i].expirationDate.month << "/" << products[i].expirationDate.year << endl;
-        cout << "Price: $" << products[i].price << endl;
-        cout << "*" << endl;
+
+    // Step 1: Display categories
+    cout << "Available Categories:" << endl;
+    cout << "1. Bakery" << endl;
+    cout << "2. Dairy" << endl;
+    cout << "3. Snacks" << endl;
+    cout << "4. Sweets" << endl;
+    cout << "5. Beverages" << endl;
+    cout << "6. Dry Food" << endl;
+    cout << "Enter the number of the category you want to view: ";
+    int categoryChoice;
+    cin >> categoryChoice;
+    cin.ignore();
+
+    // Step 2: Determine the selected category
+    string selectedCategory;
+    switch (categoryChoice)
+    {
+    case 1:
+        selectedCategory = "Bakery";
+        break;
+    case 2:
+        selectedCategory = "Dairy";
+        break;
+    case 3:
+        selectedCategory = "Snacks";
+        break;
+    case 4:
+        selectedCategory = "Sweets";
+        break;
+    case 5:
+        selectedCategory = "Beverages";
+        break;
+    case 6:
+        selectedCategory = "Dry Food";
+        break;
+    default:
+        cout << "Invalid category choice!" << endl;
+        return;
+    }
+
+    // Step 3: Display products in the selected category
+    cout << "Products in " << selectedCategory << " category:" << endl;
+    cout << "--------------------------------------" << endl;
+    bool found = false;
+    for (int i = 0; i < product_count; i++)
+    {
+        if (products[i].Category == selectedCategory)
+        {
+            found = true;
+            cout << i + 1 << ". " << products[i].name << endl;
+            cout << "   Code: " << products[i].code << endl;
+            cout << "   Price: $" << products[i].price << endl;
+            cout << "   Quantity: " << products[i].quantity << endl;
+            cout << "   Production Date: " << products[i].productionDate.day << "/"
+                << products[i].productionDate.month << "/" << products[i].productionDate.year << endl;
+            cout << "   Expiration Date: " << products[i].expirationDate.day << "/"
+                << products[i].expirationDate.month << "/" << products[i].expirationDate.year << endl;
+            cout << "--------------------------------------" << endl;
+        }
+    }
+
+    if (!found)
+    {
+        cout << "No products available in the selected category." << endl;
     }
 }
 
 void user_menu()
 {
     string choice;
-    bool running = true;
-    while (running)
+
+    do
     {
         cout << endl;
         cout << "*Welcome to Ragab`s sons Supermarket*" << endl;
@@ -499,20 +578,21 @@ void user_menu()
         cout << "2. Display Menu" << endl;
         cout << "3. Create Order" << endl;
         cout << "4. View Order" << endl;
-        cout << "5. Calculate Total Price" << endl;
-        cout << "6. Products Info" << endl;
-        cout << "7. Exit" << endl;
+        cout << "5. Products Info" << endl;
+        cout << "6. Exit" << endl;
         cout << "Enter your choice: ";
-        cin >> choice;
-        cin.ignore(); // Read input as a string
+        cin >> choice; // Read input as a string
 
         if (choice == "1")
         {
-            editCustomerData();
+            string idToEdit;
+            cout << "Enter the ID of the customer to edit: ";
+            cin >> idToEdit;
+            editCustomerData(idToEdit);
         }
         else if (choice == "2")
         {
-            displayProductMenu();
+            showAllProducts();
         }
         else if (choice == "3")
         {
@@ -520,30 +600,28 @@ void user_menu()
         }
         else if (choice == "4")
         {
-            viewOrder_user();
+            int IDindex;
+            cout << "Please enter your ID : ";
+            cin >> IDindex;
+            viewOrder_user(IDindex);
         }
         else if (choice == "5")
         {
-            processOrder();
+            displayProductMenu();
         }
         else if (choice == "6")
         {
-            print_products();
-        }
-        else if (choice == "7")
-        {
             cout << "Logging out..." << endl;
-            running = false;
+            break;
         }
         else
         {
             cout << "Invalid choice. Please try again." << endl;
         }
-    }
-}
 
-bool login()
-{
+    } while (choice != "7"); // Loop will now exit correctly when "7" is entered.
+}
+void login() {
     const string adminId = "admin";
     const string adminPassword = "1234";
 
@@ -552,13 +630,15 @@ bool login()
 
     while (true)
     {
-        cout << "Enter your ID (or type 'exit' to cancel): ";
+        cout << "Enter your ID (or type 'cancel' to cancel): ";
+
         cin >> inputId;
 
-        if (inputId == "exit")
+        if (inputId == "cancel")
         {
             cout << "Login cancelled." << endl;
-            return false;
+            break;
+
         }
 
         cout << "Enter your password: ";
@@ -569,41 +649,112 @@ bool login()
         {
             cout << "Admin login successful!" << endl;
             MenuAdmin();
-            return true;
+            return;
         }
-
-        // Customer login check
-        ifstream file("customers.txt");
-        if (file.is_open())
+        for (int i = 0; i < customer_count; i++)
         {
-            string id, password, name, phone, location;
-            bool found = false;
-
-            while (file >> id >> password >> name >> phone >> location)
+            if (customers[i].Id == inputId && customers[i].password == inputPassword)
             {
-                if (id == inputId && password == inputPassword)
-                {
-                    cout << "Login successful!" << endl;
-                    cout << "Welcome, " << name << "!" << endl;
-                    user_menu();
-                    file.close();
-                    return true;
-                }
+                cout << "welcome " << customers[i].name << endl;
+                user_menu();
+                return;
             }
 
-            file.close();
-            cout << "Invalid ID or password. Please try again." << endl;
         }
-        else
-        {
-            cerr << "Error: Unable to open file to verify login." << endl;
-            return false;
-        }
+        cout << "the password or id is not true. try again" << endl;
     }
 }
+bool loadAllFromFile() {
+    // Load customers
+    ifstream custFile("customers.txt");
+    if (custFile.is_open()) {
+        customer_count = 0;
+        while (custFile >> customers[customer_count].Id
+            >> customers[customer_count].password
+            >> customers[customer_count].name
+            >> customers[customer_count].phone
+            >> customers[customer_count].location) {
+            customer_count++;
+            if (customer_count >= Max) {
+                cout << "Warning: Max customer limit reached while loading." << endl;
+                break;
+            }
+        }
+        custFile.close();
 
+    }
+    else {
+        cerr << "Warning: customers.txt not found." << endl;
+    }
+
+    // Load products
+    ifstream prodFile("products.txt");
+    if (!prodFile.is_open()) {
+        cerr << "Error: Unable to open products.txt for loading." << endl;
+        return false;
+    }
+
+    product_count = 0;
+    while (prodFile.peek() != EOF) {
+        if (!(prodFile >> products[product_count].code)) break;
+        prodFile.ignore(); 
+
+        prodFile >> products[product_count].name;
+        prodFile.ignore(); 
+        prodFile >> products[product_count].Category;
+        prodFile.ignore();
+        prodFile >> products[product_count].productionDate.day;
+        prodFile.ignore(); 
+        prodFile >> products[product_count].productionDate.month;
+        prodFile.ignore(); 
+        prodFile >> products[product_count].productionDate.year;
+        prodFile.ignore(); 
+        prodFile >> products[product_count].expirationDate.day;
+        prodFile.ignore();
+        prodFile >> products[product_count].expirationDate.month;
+        prodFile.ignore(); 
+        prodFile >> products[product_count].expirationDate.year;
+        prodFile.ignore(); 
+        prodFile >> products[product_count].price;
+        prodFile.ignore(); 
+        prodFile >> products[product_count].quantity;
+        prodFile.ignore(numeric_limits<streamsize>::max(), '\n'); // skip to next line
+
+        product_count++;
+        if (product_count >= Max) {
+            cout << "Warning: Max product limit reached while loading." << endl;
+            break;
+        }
+    }
+
+    prodFile.close();
+
+    // Load orders
+	ifstream orderfile("orders.txt");
+    if (!orderfile.is_open()) {
+
+		cerr << "Error: Unable to open orders.txt for loading." << endl;
+    }
+	order_count = 0;
+    while (orderfile.peek() != EOF) {
+		orderfile >> currentOrder[order_count].customerId;
+		orderfile >> currentOrder[order_count].numProducts;
+		orderfile >> currentOrder[order_count].totalPrice;
+		for (int j = 0; j < currentOrder[order_count].numProducts; j++)
+		{
+			orderfile >> currentOrder[order_count].productName[j];
+		}
+		order_count++;
+    
+    
+    }
+
+
+    return true;
+}
 int main()
 {
+    loadAllFromFile();
     string choice;
     do
     {
@@ -611,7 +762,7 @@ int main()
         cout << "2. Login" << endl;
         cout << "3. Exit" << endl;
         cout << "Enter your choice: ";
-        getline(cin, choice); // Read input as a string
+        cin >> choice; // Read input as a string
 
         if (choice == "1")
         {
@@ -620,11 +771,12 @@ int main()
         else if (choice == "2")
         {
             login();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
         }
         else if (choice == "3")
         {
-            cout << "Exiting..." << endl;
+            // Save all products to 'the file before exiting
+
+            cout << "Exiting... All products have been saved." << endl;
             break;
         }
         else
@@ -632,6 +784,6 @@ int main()
             cout << "Invalid choice. Please try again." << endl;
         }
     } while (choice != "3");
-
+    saveToFile();
     return 0;
 }
