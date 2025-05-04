@@ -68,14 +68,14 @@ void saveToFile()
   }
   else
   {
-    cerr << "Error: Unable to open file for saving." << endl;
+    cerr << "\033[1;31mError: Unable to open file for saving.\033[0m" << endl;
   }
 
   // Save products to file
   ofstream filee("products.txt");
   if (!filee.is_open())
   {
-    cerr << "Error: Unable to open file to save products." << endl;
+    cerr << "\033[1;31mError: Unable to open file to save products.\033[0m" << endl;
     return;
   }
 
@@ -89,12 +89,11 @@ void saveToFile()
 
   filee.close();
 
-  // Save products to file
-
+  // Save orders to file
   ofstream orderfile("orders.txt");
   if (!orderfile.is_open())
   {
-    cerr << "Error: Unable to open file to save orders." << endl;
+    cerr << "\033[1;31mError: Unable to open file to save orders.\033[0m" << endl;
     return;
   }
   for (int i = 0; i < order_count; i++)
@@ -114,7 +113,7 @@ void signup()
 {
   if (customer_count >= Max)
   {
-    cout << "Error: Customer limit reached." << endl;
+    cout << "\033[1;31mError: Customer limit reached.\033[0m" << endl;
     return;
   }
 
@@ -127,7 +126,7 @@ void signup()
   {
     if (customers[i].Id == c.Id)
     {
-      cout << "Error: ID already exists. Please use a different ID." << endl;
+      cout << "\033[1;31mError: ID already exists. Please use a different ID.\033[0m" << endl;
       return;
     }
   }
@@ -144,14 +143,14 @@ void signup()
   // Add new customer to array
   customers[customer_count++] = c;
 
-  cout << "Signup successful!" << endl;
+  cout << "\033[1;32mSignup successful!\033[0m" << endl; // Green for success
 }
 
 void addProduct()
 {
   if (product_count >= Max)
   {
-    cout << "Error: Cannot add more products. Maximum limit reached." << endl;
+    cout << "\033[1;31mError: Cannot add more products. Maximum limit reached.\033[0m" << endl;
     return;
   }
 
@@ -160,7 +159,6 @@ void addProduct()
   cin >> p.code;
   cin.ignore();
   cout << "Enter product name: ";
-  // cin.ignore();
   getline(cin, p.name); // Fixed to handle multi-word product names
 
   // Predefined categories
@@ -184,7 +182,7 @@ void addProduct()
     }
     else
     {
-      cout << "Invalid category choice! Please try again." << endl;
+      cout << "\033[1;31mInvalid category choice! Please try again.\033[0m" << endl;
     }
   }
 
@@ -203,8 +201,7 @@ void addProduct()
   // Add the product to the array
   products[product_count++] = p;
 
-  cout << "Product added successfully!" << endl;
-  // product_count++;
+  cout << "\033[1;32mProduct added successfully!\033[0m" << endl; // Green for success
 }
 
 void editProduct()
@@ -232,14 +229,14 @@ void editProduct()
       cin >> products[i].price;
       cout << "Enter new product quantity: ";
       cin >> products[i].quantity;
-      cout << "Product updated successfully!" << endl;
+      cout << "\033[1;32mProduct updated successfully!\033[0m" << endl; // Green for success
       break;
     }
   }
 
   if (!found)
   {
-    cout << "Product with code " << codeToEdit << " not found in the array." << endl;
+    cout << "\033[1;31mProduct with code " << codeToEdit << " not found in the array.\033[0m" << endl;
   }
 }
 
@@ -257,15 +254,15 @@ void deleteProduct(string codeToDelete)
       {
         products[j] = products[j + 1];
       }
-      product_count--; // Decrease the product count
-      cout << "Product with code " << codeToDelete << " has been deleted." << endl;
+      product_count--;                                                                               // Decrease the product count
+      cout << "\033[1;32mProduct with code " << codeToDelete << " has been deleted.\033[0m" << endl; // Green for success
       break;
     }
   }
 
   if (!found)
   {
-    cout << "Product with code " << codeToDelete << " not found." << endl;
+    cout << "\033[1;31mProduct with code " << codeToDelete << " not found.\033[0m" << endl;
   }
 }
 
@@ -273,7 +270,7 @@ void showAllProducts()
 {
   cout << "All Products:" << endl;
   cout << "--------------------------------------" << endl;
-  for (int i = 0; i < product_count; ++i)
+  for (int i = 0; i < product_count; i++)
   {
     cout << "Code: " << products[i].code << endl;
     cout << "Name: " << products[i].name << endl;
@@ -290,7 +287,7 @@ void createOrder(string inputId)
 {
   if (order_count >= Max)
   {
-    cout << "Error: Cannot create more orders. Maximum limit reached." << endl;
+    cout << "\033[1;31mError: Cannot create more orders. Maximum limit reached.\033[0m" << endl;
     return;
   }
 
@@ -320,7 +317,7 @@ void createOrder(string inputId)
         // Check if sufficient quantity is available
         if (quantity > products[i].quantity)
         {
-          cout << "Error: Only " << products[i].quantity << " units available in stock." << endl;
+          cout << "\033[1;31mError: Only " << products[i].quantity << " units available in stock.\033[0m" << endl;
           break;
         }
 
@@ -331,14 +328,14 @@ void createOrder(string inputId)
         // Deduct quantity from stock
         products[i].quantity -= quantity;
 
-        cout << "Product added to order successfully!" << endl;
+        cout << "\033[1;32mProduct added to order successfully!\033[0m" << endl; // Green for success
         break;
       }
     }
 
     if (!found)
     {
-      cout << "Error: Product not found!" << endl;
+      cout << "\033[1;31mError: Product not found!\033[0m" << endl;
     }
 
     cout << "Do you want to add another product? (y/n): ";
@@ -350,11 +347,11 @@ void createOrder(string inputId)
   if (newOrder.numProducts > 0)
   {
     currentOrder[order_count++] = newOrder;
-    cout << "Order created successfully! Total price: $" << newOrder.totalPrice << endl;
+    cout << "\033[1;32mOrder created successfully! Total price: $" << newOrder.totalPrice << "\033[0m" << endl; // Green for success
   }
   else
   {
-    cout << "No valid products were added to the order. Order was not created." << endl;
+    cout << "\033[1;31mNo valid products were added to the order. Order was not created.\033[0m" << endl;
   }
 }
 
@@ -363,7 +360,7 @@ void viewOrders_admin()
 
   if (order_count == 0)
   {
-    cout << "No orders to display." << endl;
+    cout << "\033[1;31mNo orders to display.\033[0m" << endl; // Red text
     return;
   }
 
@@ -389,7 +386,11 @@ void MenuAdmin()
   while (running)
   {
     cout << endl;
-    cout << "****** Welcome to Ragab`s Sons Supermarket ******" << endl;
+    cout << endl;
+    cout << "=========================================" << endl;
+    cout << "\033[1;32m         Ragab's Sons Supermarket        \033[0m" << endl; // Green text
+    cout << "Welcome, Admin!" << endl;
+    cout << "=========================================" << endl;
     cout << endl;
     cout << "1. Add Product" << endl;
     cout << "2. Edit Product" << endl;
@@ -507,7 +508,7 @@ void viewOrder_user(string IDindex)
   }
   if (!found)
   {
-    cout << "there is no order created. " << endl;
+    cout << "\033[1;31mThere is no order created. \033[0m" << endl; // Red text
     return;
   }
 }
@@ -516,7 +517,7 @@ void displayProductMenu()
 {
   if (product_count == 0)
   {
-    cout << "No products available in the supermarket." << endl;
+    cout << "\033[1;31mNo products available in the supermarket.\033[0m" << endl; // Red text
     return;
   }
 
@@ -587,6 +588,34 @@ void displayProductMenu()
   }
 }
 
+void searchProduct()
+{
+  string searchName;
+  cout << "Enter product name to search: ";
+  cin.ignore();
+  getline(cin, searchName);
+
+  bool found = false;
+  for (int i = 0; i < product_count; i++)
+  {
+    if (products[i].name == searchName)
+    {
+      found = true;
+      cout << "Product found: " << endl;
+      cout << "Code: " << products[i].code << endl;
+      cout << "Name: " << products[i].name << endl;
+      cout << "Price: $" << products[i].price << endl;
+      cout << "Quantity: " << products[i].quantity << endl;
+      break;
+    }
+  }
+
+  if (!found)
+  {
+    cout << "\033[1;31mProduct not found.\033[0m" << endl;
+  }
+}
+
 void user_menu(string inputId, string name)
 {
   string choice;
@@ -606,7 +635,8 @@ void user_menu(string inputId, string name)
     cout << "3. Create Order" << endl;
     cout << "4. View Your Orders" << endl;
     cout << "5. Browse Products by Category" << endl;
-    cout << "6. Logout" << endl;
+    cout << "6. Search Product" << endl;
+    cout << "7. Logout" << endl;
     cout << "-----------------------------------------" << endl;
     cout << "Enter your choice: ";
     cin >> choice;
@@ -638,6 +668,11 @@ void user_menu(string inputId, string name)
     }
     else if (choice == "6")
     {
+      cout << "\n--- Search Product ---" << endl;
+      searchProduct();
+    }
+    else if (choice == "7")
+    {
       cout << "\nLogging out... Thank you for visiting Ragab's Sons Supermarket!" << endl;
       break;
     }
@@ -648,7 +683,7 @@ void user_menu(string inputId, string name)
 
     cout << "-----------------------------------------" << endl;
 
-  } while (choice != "6");
+  } while (choice != "7");
 }
 
 void login()
@@ -662,12 +697,11 @@ void login()
   while (true)
   {
     cout << "Enter your ID (or type 'cancel' to cancel): ";
-
     cin >> inputId;
 
     if (inputId == "cancel")
     {
-      cout << "Login cancelled." << endl;
+      cout << "\033[1;33mLogin cancelled.\033[0m" << endl; // Yellow for cancellation
       break;
     }
 
@@ -677,10 +711,12 @@ void login()
     // Admin login check
     if (inputId == adminId && inputPassword == adminPassword)
     {
-      cout << "Admin login successful!" << endl;
+      cout << "\033[1;32mAdmin login successful!\033[0m" << endl; // Green for success
       MenuAdmin();
       return;
     }
+
+    // Customer login check
     for (int i = 0; i < customer_count; i++)
     {
       if (customers[i].Id == inputId && customers[i].password == inputPassword)
@@ -692,12 +728,13 @@ void login()
           this_thread::sleep_for(chrono::milliseconds(500));
         }
         cout << " Done!" << endl;
-        cout << "Login successful!" << endl;
+        cout << "\033[1;32mLogin successful!\033[0m" << endl; // Green for success
         user_menu(inputId, customers[i].name);
         return;
       }
     }
-    cout << "\033[1;31mThe password or the ID is incorrect. try again\033[0m" << endl; // Red text
+
+    cout << "\033[1;31mThe password or the ID is incorrect. Try again.\033[0m" << endl; // Red for error
     cout << "If you don't have an account, please sign up." << endl;
   }
 }
@@ -714,7 +751,7 @@ bool loadAllFromFile()
       customer_count++;
       if (customer_count >= Max)
       {
-        cout << "Warning: Max customer limit reached while loading." << endl;
+        cout << "\033[1;33mWarning: Max customer limit reached while loading.\033[0m" << endl; // Yellow for warnings
         break;
       }
     }
@@ -764,7 +801,7 @@ bool loadAllFromFile()
     product_count++;
     if (product_count >= Max)
     {
-      cout << "Warning: Max product limit reached while loading." << endl;
+      cout << "\033[1;33mWarning: Max product limit reached while loading.\033[0m" << endl; // Yellow for warnings
       break;
     }
   }
@@ -794,8 +831,26 @@ bool loadAllFromFile()
   return true;
 }
 
+void displayHelp()
+{
+  cout << "Help Menu:" << endl;
+  cout << "1. Sign up: Create a new customer account." << endl;
+  cout << "2. Login: Log in to your account." << endl;
+  cout << "3. Exit: Exit the program." << endl;
+}
+
+void displayWelcomeScreen()
+{
+  cout << "*****************************************" << endl;
+  cout << "\033[1;32m*       Welcome to Ragab's Sons         *\033[0m" << endl;
+  cout << "\033[1;32m*          Supermarket System           *\033[0m" << endl;
+  cout << "*****************************************" << endl;
+  cout << "Your one-stop shop for all your needs!" << endl;
+}
+
 int main()
 {
+  displayWelcomeScreen();
   loadAllFromFile();
   string choice;
   do
@@ -808,6 +863,7 @@ int main()
     cout << "1. Sign up" << endl;
     cout << "2. Login" << endl;
     cout << "3. Exit" << endl;
+    cout << "4. Help" << endl;
     cout << "Enter your choice: ";
     cin >> choice; // Read input as a string
 
@@ -824,7 +880,13 @@ int main()
       // Save all products to 'the file before exiting
 
       cout << "Exiting... All products have been saved." << endl;
+      cout << "\033[1;32mThank you for using Ragab's Sons Supermarket System!\033[0m" << endl;
+      cout << "\033[1;32mWe hope to see you again soon. Goodbye!\033[0m" << endl;
       break;
+    }
+    else if (choice == "4")
+    {
+      displayHelp();
     }
     else
     {
