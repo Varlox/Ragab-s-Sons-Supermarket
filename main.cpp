@@ -432,7 +432,7 @@ void MenuAdmin()
     }
     else
     {
-      cout << "Invalid choice. Please try again." << endl;
+      cout << "\033[1;31mInvalid choice. Please try again.\033[0m" << endl; // Red text
     }
   }
 }
@@ -556,7 +556,7 @@ void displayProductMenu()
     selectedCategory = "Dry Food";
     break;
   default:
-    cout << "Invalid category choice!" << endl;
+    cout << "\033[1;31mInvalid category choice!\033[0m" << endl; // Red text
     return;
   }
 
@@ -583,7 +583,7 @@ void displayProductMenu()
 
   if (!found)
   {
-    cout << "No products available in the selected category." << endl;
+    cout << "\033[1;31mNo products available in the selected category.\033[0m" << endl; // Red text
   }
 }
 
@@ -643,7 +643,7 @@ void user_menu(string inputId, string name)
     }
     else
     {
-      cout << "\nInvalid choice. Please try again." << endl;
+      cout << "\033[1;31m\nInvalid choice. Please try again.\033[0m" << endl; // Red text
     }
 
     cout << "-----------------------------------------" << endl;
@@ -697,7 +697,8 @@ void login()
         return;
       }
     }
-    cout << "the password or id is not true. try again" << endl;
+    cout << "\033[1;31mThe password or the ID is incorrect. try again\033[0m" << endl; // Red text
+    cout << "If you don't have an account, please sign up." << endl;
   }
 }
 
