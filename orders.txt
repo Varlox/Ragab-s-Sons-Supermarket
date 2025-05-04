@@ -2,3 +2,8 @@
 cheddar chips bread 
 2020 1 75
 chips 
+0 0 0
+
+0 0 2020
+
+1 450 0

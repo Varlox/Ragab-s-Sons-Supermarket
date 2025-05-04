@@ -1,12 +1,12 @@
 b1 bread Bakery 5 5 2025 12 5 2025 2 180
 b2 toast Bakery 4 5 2025 11 5 2025 45 50
-b3 cupcake Bakery 5 5 2025 10 5 2025 15 30
+b3 cupcake Bakery 5 5 2025 10 5 2025 15 28
 b4 brownies Bakery 5 5 2025 10 5 2025 20 50
 d1 milk dairy 4 5 2025 4 8 2025 45 40
 d2 butter Dairy 3 5 2025 3 11 2025 200 30
 d3 cheddar cheese Dairy 28 4 2025 28 6 2025 69
 d4 yogurt Dairy 15 4 2025 15 7 2025 11 50
-sn1 chips Snacks 20 3 2025 19 9 2025 15 40
+sn1 chips Snacks 20 3 2025 19 9 2025 15 8
 sn2 crackers Snacks 28 2 2025 28 12 2025 20 60
 sn3 popcorn Snacks 5 3 2025 5 8 2025 20 34
 sw1 ice cream Sweets 21 2 2025 21 11 2025 17
@@ -17,3 +17,4 @@ bv2 cola Beverages 7 4 2025 8 12 2025 15 49
 bv3 orange Beverages 20 1 2025 20 8 2025 10 30
 bv4 malt Beverages 30 12 2024 28 9 2025 15 25
 d5 nisto Dairy 21 2 2025 21 2 2026 30 10
+b6 corrsiont Bakery 23 2 2026 29 2 2028 20 3

@@ -146,6 +146,21 @@ void signup()
   cout << "\033[1;32mSignup successful!\033[0m" << endl; // Green for success
 }
 
+bool isValidDate(int day, int month, int year)
+{
+  if (month < 1 || month > 12 || day < 1 || day > 31)
+    return false;
+  if ((month == 4 || month == 6 || month == 9 || month == 11) && day > 30)
+    return false;
+  if (month == 2)
+  {
+    bool isLeap = (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+    if (day > (isLeap ? 29 : 28))
+      return false;
+  }
+  return true;
+}
+
 void addProduct()
 {
   if (product_count >= Max)
@@ -186,11 +201,35 @@ void addProduct()
     }
   }
 
-  cout << "Enter production date (dd mm yyyy): ";
-  cin >> p.productionDate.day >> p.productionDate.month >> p.productionDate.year;
+  // Validate production date
+  while (true)
+  {
+    cout << "Enter production date (dd mm yyyy): ";
+    cin >> p.productionDate.day >> p.productionDate.month >> p.productionDate.year;
+    if (isValidDate(stoi(p.productionDate.day), stoi(p.productionDate.month), stoi(p.productionDate.year)))
+    {
+      break;
+    }
+    else
+    {
+      cout << "\033[1;31mInvalid production date! Please try again.\033[0m" << endl;
+    }
+  }
 
-  cout << "Enter expiration date (dd mm yyyy): ";
-  cin >> p.expirationDate.day >> p.expirationDate.month >> p.expirationDate.year;
+  // Validate expiration date
+  while (true)
+  {
+    cout << "Enter expiration date (dd mm yyyy): ";
+    cin >> p.expirationDate.day >> p.expirationDate.month >> p.expirationDate.year;
+    if (isValidDate(stoi(p.expirationDate.day), stoi(p.expirationDate.month), stoi(p.expirationDate.year)))
+    {
+      break;
+    }
+    else
+    {
+      cout << "\033[1;31mInvalid expiration date! Please try again.\033[0m" << endl;
+    }
+  }
 
   cout << "Enter product price: ";
   cin >> p.price;
@@ -221,10 +260,37 @@ void editProduct()
       cin >> products[i].name;
       cout << "Enter new product category: ";
       cin >> products[i].Category;
-      cout << "Enter new production date (dd mm yyyy): ";
-      cin >> products[i].productionDate.day >> products[i].productionDate.month >> products[i].productionDate.year;
-      cout << "Enter new expiration date (dd mm yyyy): ";
-      cin >> products[i].expirationDate.day >> products[i].expirationDate.month >> products[i].expirationDate.year;
+
+      // Validate production date
+      while (true)
+      {
+        cout << "Enter new production date (dd mm yyyy): ";
+        cin >> products[i].productionDate.day >> products[i].productionDate.month >> products[i].productionDate.year;
+        if (isValidDate(stoi(products[i].productionDate.day), stoi(products[i].productionDate.month), stoi(products[i].productionDate.year)))
+        {
+          break;
+        }
+        else
+        {
+          cout << "\033[1;31mInvalid production date! Please try again.\033[0m" << endl;
+        }
+      }
+
+      // Validate expiration date
+      while (true)
+      {
+        cout << "Enter new expiration date (dd mm yyyy): ";
+        cin >> products[i].expirationDate.day >> products[i].expirationDate.month >> products[i].expirationDate.year;
+        if (isValidDate(stoi(products[i].expirationDate.day), stoi(products[i].expirationDate.month), stoi(products[i].expirationDate.year)))
+        {
+          break;
+        }
+        else
+        {
+          cout << "\033[1;31mInvalid expiration date! Please try again.\033[0m" << endl;
+        }
+      }
+
       cout << "Enter new product price: ";
       cin >> products[i].price;
       cout << "Enter new product quantity: ";
@@ -420,7 +486,11 @@ void MenuAdmin()
     cout << endl;
     cout << "=========================================" << endl;
     cout << "\033[1;32m         Ragab's Sons Supermarket        \033[0m" << endl; // Green text
-    cout << "Welcome, Admin!" << endl;
+    cout << "\033[1;32m         Admin Dashboard                 \033[0m" << endl;
+    cout << "=========================================" << endl;
+    cout << "Total Customers: " << customer_count << endl;
+    cout << "Total Products: " << product_count << endl;
+    cout << "Total Orders: " << order_count << endl;
     cout << "=========================================" << endl;
     cout << endl;
     cout << "1. Add Product" << endl;
@@ -647,6 +717,22 @@ void searchProduct()
   }
 }
 
+void collectFeedback()
+{
+  string feedback;
+  cout << "We value your feedback! Please share your thoughts: ";
+  cin.ignore();
+  getline(cin, feedback);
+
+  ofstream feedbackFile("feedback.txt", ios::app);
+  if (feedbackFile.is_open())
+  {
+    feedbackFile << feedback << endl;
+    feedbackFile.close();
+    cout << "\033[1;32mThank you for your feedback!\033[0m" << endl;
+  }
+}
+
 void user_menu(string inputId, string name)
 {
   string choice;
@@ -667,7 +753,8 @@ void user_menu(string inputId, string name)
     cout << "4. View Your Orders" << endl;
     cout << "5. Browse Products by Category" << endl;
     cout << "6. Search Product" << endl;
-    cout << "7. Logout" << endl;
+    cout << "7. Provide Feedback" << endl;
+    cout << "8. Logout" << endl;
     cout << "-----------------------------------------" << endl;
     cout << "Enter your choice: ";
     cin >> choice;
@@ -703,6 +790,11 @@ void user_menu(string inputId, string name)
       searchProduct();
     }
     else if (choice == "7")
+    {
+      cout << "\n--- Provide Feedback ---" << endl;
+      collectFeedback();
+    }
+    else if (choice == "8")
     {
       cout << "\nLogging out... Thank you for visiting Ragab's Sons Supermarket!" << endl;
       break;
